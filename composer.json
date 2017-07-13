@@ -1,0 +1,11 @@
+{
+  "autoload": {
+    "psr-0": {
+      "Reense\\ConsoleCommand\\": "src"
+    }
+  },
+  "require": {
+    "symfony/console": "^3.3",
+    "illuminate/support": "^5.4"
+  }
+}
