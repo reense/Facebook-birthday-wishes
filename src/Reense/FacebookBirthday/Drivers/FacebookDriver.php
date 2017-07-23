@@ -5,10 +5,12 @@ namespace Reense\FacebookBirthday\Drivers;
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class FacebookDriver extends WebDriver
 {
-    protected $facebookLoginUrl =  'https://www.facebook.com/';
+    protected $facebookLoginUrl =  'https://www.facebook.com/login.php';
     protected $birthdaysUrl     =  'https://www.facebook.com/birthdays';
 
     protected $messages = [
@@ -23,7 +25,9 @@ class FacebookDriver extends WebDriver
         'password'  => '#pass'
     ];
 
-    public function __construct()
+    private $output;
+
+    public function __construct(OutputInterface $output)
     {
         parent::__construct();
         $this->driver->get($this->facebookLoginUrl);
@@ -41,8 +45,8 @@ class FacebookDriver extends WebDriver
 
             $element->findElement(WebDriverBy::cssSelector('#loginbutton'))->click();
         } catch(\Exception $e) {
-            echo "Fuck". $e->getMessage();
-            return true;
+            $this->output->writeln("<error> Could not login. The error message is: {$e->getMessage()}.</error>");
+            return false;
         }
 
         return true;
@@ -50,18 +54,35 @@ class FacebookDriver extends WebDriver
 
     public function navigateToBirthdays() {
         $this->driver->get($this->birthdaysUrl);
+
+        
     }
 
     public function congratulateAll() {
-        $elements = $this->driver->findElements(WebDriverBy::cssSelector(".fbCalendarHappyBirthdayer"));
+        try {
+            /**
+             * Get all the elements from that page that contain people
+             * having their birthday today
+             */
+            $peopleToCongratulate = $this->driver->findElements(WebDriverBy::cssSelector(".fbCalendarHappyBirthdayer"));
 
-        foreach($elements as $element) {
-            $bd = $element->findElements(WebDriverBy::cssSelector('textarea'));
-            foreach ($bd as $user) {
-                $user->sendKeys($this->messages[array_rand($this->messages)]);
-                $user->sendKeys(WebDriverKeys::RETURN_KEY);
+            foreach ($peopleToCongratulate as $personToCongratulate) {
+                $birthdayTextElements = $personToCongratulate->findElements(WebDriverBy::cssSelector('textarea'));
+                foreach ($birthdayTextElements as $birthdayTextElement) {
+                    /**
+                     * Set a custom message, so that it looks more natural.
+                     */
+                    $birthdayTextElement->sendKeys($this->messages[array_rand($this->messages)]);
+                    /**
+                     * Hit enter in the textbox, which will trigger a form submit.
+                     */
+                    $birthdayTextElement->sendKeys(WebDriverKeys::RETURN_KEY);
 
+                }
             }
+        } catch(\Exception $e) {
+            $this->output->writeln("<error> Could not congratulate people. The error message is: {$e->getMessage()}.</error>");
+            return false;
         }
     }
 

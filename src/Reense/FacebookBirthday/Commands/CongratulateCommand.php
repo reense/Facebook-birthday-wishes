@@ -25,7 +25,7 @@ class CongratulateCommand extends FacebookCommand
     protected function configure()
     {
         $this->setName("congratulate")
-             ->setDescription("Congratulate people whos birthday it is today")
+             ->setDescription("Congratulate Facebook friends that are having their birthday today.")
              ->addArgument('email', InputArgument::REQUIRED, 'Your Facebook login password.')
              ->addArgument('password', InputArgument::REQUIRED, 'Your Facebook login password.');
     }
@@ -34,13 +34,16 @@ class CongratulateCommand extends FacebookCommand
     {
         $this->output = $output;
 
-        $this->facebookDriver = new FacebookDriver;
+        $this->facebookDriver = new FacebookDriver($output);
 
 
 
         if($this->facebookDriver->loginWithCredentials($input->getArgument('email'), $input->getArgument('password'))) {
             $this->facebookDriver->navigateToBirthdays();
             $this->facebookDriver->congratulateAll();
+        }
+        else {
+            $this->error("Could not login to Facebook.");
         }
 
 

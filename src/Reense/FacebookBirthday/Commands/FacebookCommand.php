@@ -22,17 +22,17 @@ class FacebookCommand extends  Command
     }
 
 
-    protected function comment($msg) {
+    public function comment($msg) {
         $this->output->writeln("<comment>$msg</comment>");
     }
 
 
-    protected function success($msg) {
+    public function success($msg) {
         $this->output->writeln("<info>$msg</info>");
     }
 
-    protected function error($msg) {
-        $out = $this->output->writeln("<error>$msg</error>");
+    public function error($msg) {
+        $this->output->writeln("<error>$msg</error>");
 
     }
 }
