@@ -4,7 +4,7 @@ This is a selenium project that automatically congratulates all your Facebook fr
 
 
 ### To Run
-1. Composer install
+1. `composer install`
 1. Run `java -jar selenium-server-standalone-3.4.0.jar`
 2. Run (In another tab) `php facebook congratulate [FACEBOOK_EMAIL] [FACEBOOK_PASSWORD]`
    Example : `php facebook congratulate fb@example.com myp4ssw0rd`
